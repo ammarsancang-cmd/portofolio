@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portofolio & Karya - Ammar Tubagus Sancang</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom smooth transition */
+        .project-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar (Matching Screenshot Header) -->
+    <header class="bg-[#1e88e5] text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <h1 class="text-xl sm:text-2xl font-semibold tracking-wide">Portofolio & Karya</h1>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="resetFilters()" title="Refresh / Reset Filter" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                </button>
+                <button onclick="openAddProjectModal()" title="Tambah Karya Baru" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <i data-lucide="plus" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- Controls Section: Filter & Search Bar -->
+        <div class="bg-white p-4 sm:p-5 rounded-xl border border-gray-200/80 shadow-sm mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- Category Filter Dropdown (Matches Screenshot Style) -->
+            <div class="w-full md:w-auto flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                <label for="categoryFilter" class="text-gray-700 font-medium text-sm sm:text-base whitespace-nowrap">Filter Kategori:</label>
+                <div class="relative w-full sm:w-64">
+                    <select id="categoryFilter" onchange="filterProjects()" class="w-full appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2.5 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm cursor-pointer shadow-sm">
+                        <option value="Semua">Semua</option>
+                        <option value="Mobile App">Mobile App</option>
+                        <option value="Web Development">Web Development</option>
+                        <option value="UI/UX Design">UI/UX Design</option>
+                        <option value="Graphic Design">Graphic Design</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Input -->
+            <div class="w-full md:w-72 relative">
+                <input type="text" id="searchInput" oninput="filterProjects()" placeholder="Cari karya atau teknologi..." class="w-full bg-gray-50 border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Badge Tabs (Mobile / Quick Filter) -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-3 mb-4 scrollbar-none">
+            <button onclick="setCategoryFilter('Semua')" class="filter-badge active px-4 py-1.5 rounded-full text-xs font-medium bg-blue-600 text-white whitespace-nowrap transition-colors">Semua</button>
+            <button onclick="setCategoryFilter('Mobile App')" class="filter-badge px-4 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap transition-colors">Mobile App</button>
+            <button onclick="setCategoryFilter('Web Development')" class="filter-badge px-4 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap transition-colors">Web Development</button>
+            <button onclick="setCategoryFilter('UI/UX Design')" class="filter-badge px-4 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap transition-colors">UI/UX Design</button>
+            <button onclick="setCategoryFilter('Graphic Design')" class="filter-badge px-4 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap transition-colors">Graphic Design</button>
+        </div>
+
+        <!-- Project Cards List Container (Styled exactly like Screenshot UI) -->
+        <div id="projectList" class="space-y-4">
+            <!-- Cards will be populated dynamically -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16 bg-white rounded-xl border border-dashed border-gray-300">
+            <i data-lucide="folder-open" class="w-12 h-12 text-gray-400 mx-auto mb-3"></i>
+            <p class="text-gray-500 font-medium">Tidak ada proyek yang cocok dengan pencarian Anda.</p>
+            <button onclick="resetFilters()" class="mt-3 text-sm text-blue-600 hover:underline font-semibold">Tampilkan Semua Proyek</button>
+        </div>
+    </main>
+
+    <!-- Hidden File Input for Custom Photo Upload -->
+    <input type="file" id="userPhotoInput" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-500">
+            <p>© <span id="year"></span> Ammar Tubagus Sancang — Portofolio & Karya</p>
+        </div>
+    </footer>
+
+    <!-- Project Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden px-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative animate-in fade-in zoom-in duration-150">
+            <button onclick="closeModal()" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <div id="modalContent">
+                <!-- Content inserted dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Data & Functionality -->
+    <script>
+        // Data Karya (Hanya JosLearn SMAN 1 Rejoso)
+        const initialProjects = [
+            {
+                id: 1,
+                title: "JosLearn SMAN 1 Rejoso",
+                description: "Sistem Manajemen Pembelajaran & Absensi Digital Kedisiplinan Sekolah",
+                category: "Web Development",
+                tech: "Flutter, Laravel, MySQL",
+                image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=600&q=80",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
+                details: "JosLearn SMAN 1 Rejoso merupakan platform aplikasi digital yang mengintegrasikan sistem absensi online, pemantauan kedisiplinan siswa, serta pengelolaan materi pembelajaran bagi guru dan siswa SMAN 1 Rejoso."
+            }
+        ];
+
+        let projects = [...initialProjects];
+        let currentEditingId = null;
+
+        // Render projects on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            renderProjects(projects);
+            document.getElementById('year').textContent = new Date().getFullYear();
+            lucide.createIcons();
+        });
+
+        // Trigger file picker for photo change
+        function triggerPhotoUpload(id, event) {
+            if (event) event.stopPropagation();
+            currentEditingId = id;
+            document.getElementById("userPhotoInput").click();
+        }
+
+        // Handle uploaded photo
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const project = projects.find(p => p.id === currentEditingId);
+                    if (project) {
+                        project.avatar = e.target.result;
+                        renderProjects(projects);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Function to render projects HTML
+        function renderProjects(items) {
+            const listContainer = document.getElementById("projectList");
+            const emptyState = document.getElementById("emptyState");
+
+            if (items.length === 0) {
+                listContainer.innerHTML = "";
+                emptyState.classList.remove("hidden");
+                return;
+            }
+
+            emptyState.classList.add("hidden");
+            
+            listContainer.innerHTML = items.map(project => `
+                <div class="project-card bg-[#f1f3f9]/90 hover:bg-[#e9ecf5] border border-gray-200/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between cursor-pointer shadow-sm relative overflow-hidden gap-4" onclick="openDetailModal(${project.id})">
+                    <div class="flex items-start sm:items-center gap-4">
+                        <!-- Uploadable Profile/Thumbnail Avatar -->
+                        <div class="relative group flex-shrink-0" title="Klik untuk ganti foto Anda">
+                            <div class="w-16 h-16 sm:w-18 sm:h-18 rounded-xl overflow-hidden bg-gray-200 border border-gray-300 shadow-inner">
+                                <img src="${project.avatar}" alt="${project.title}" class="w-full h-full object-cover">
+                            </div>
+                            <!-- Overlay Upload Button -->
+                            <button onclick="triggerPhotoUpload(${project.id}, event)" class="absolute inset-0 bg-black/40 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center rounded-xl transition-opacity text-[10px] font-medium gap-1">
+                                <i data-lucide="camera" class="w-4 h-4"></i>
+                                <span>Ganti Foto</span>
+                            </button>
+                        </div>
+
+                        <!-- Card Body Details -->
+                        <div class="space-y-1">
+                            <h3 class="text-base sm:text-lg font-bold text-gray-900 tracking-tight leading-snug">${project.title}</h3>
+                            <p class="text-xs sm:text-sm text-gray-500 font-normal leading-relaxed">${project.description}</p>
+                            
+                            <!-- Badges -->
+                            <div class="flex flex-wrap items-center gap-2 pt-1.5">
+                                <span class="bg-blue-100 text-blue-700 text-[11px] font-semibold px-2.5 py-0.5 rounded-md">
+                                    ${project.category}
+                                </span>
+                                <span class="text-xs text-gray-400 font-medium">
+                                    Tech: <span class="text-gray-700 font-semibold">${project.tech}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Options & Change Photo Action -->
+                    <div class="flex items-center gap-2 self-end sm:self-center">
+                        <button onclick="triggerPhotoUpload(${project.id}, event)" class="px-3 py-1.5 text-xs bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-medium shadow-sm flex items-center gap-1.5 transition-colors">
+                            <i data-lucide="upload" class="w-3.5 h-3.5 text-blue-600"></i>
+                            <span>Upload Foto Saya</span>
+                        </button>
+                        <div class="text-gray-600 hover:text-gray-900 p-1">
+                            <i data-lucide="more-vertical" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        // Filter Functionality
+        function filterProjects() {
+            const selectedCategory = document.getElementById("categoryFilter").value;
+            const searchKeyword = document.getElementById("searchInput").value.toLowerCase();
+
+            updateBadgeUI(selectedCategory);
+
+            const filtered = projects.filter(project => {
+                const matchCategory = (selectedCategory === "Semua") || (project.category === selectedCategory);
+                const matchSearch = project.title.toLowerCase().includes(searchKeyword) ||
+                                    project.description.toLowerCase().includes(searchKeyword) ||
+                                    project.tech.toLowerCase().includes(searchKeyword);
+
+                return matchCategory && matchSearch;
+            });
+
+            renderProjects(filtered);
+        }
+
+        function setCategoryFilter(category) {
+            document.getElementById("categoryFilter").value = category;
+            filterProjects();
+        }
+
+        function updateBadgeUI(activeCategory) {
+            const badges = document.querySelectorAll(".filter-badge");
+            badges.forEach(badge => {
+                if (badge.textContent.trim() === activeCategory) {
+                    badge.className = "filter-badge active px-4 py-1.5 rounded-full text-xs font-medium bg-blue-600 text-white whitespace-nowrap transition-colors";
+                } else {
+                    badge.className = "filter-badge px-4 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap transition-colors";
+                }
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById("categoryFilter").value = "Semua";
+            document.getElementById("searchInput").value = "";
+            filterProjects();
+        }
+
+        function openDetailModal(id) {
+            const project = projects.find(p => p.id === id);
+            if (!project) return;
+
+            const modalContent = document.getElementById("modalContent");
+            modalContent.innerHTML = `
+                <div class="flex items-center gap-3 mb-4">
+                    <img src="${project.avatar}" class="w-12 h-12 rounded-lg object-cover border border-gray-200" />
+                    <div>
+                        <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">${project.category}</span>
+                        <h2 class="text-xl font-bold text-gray-900 leading-tight">${project.title}</h2>
+                    </div>
+                </div>
+                <div class="rounded-xl overflow-hidden mb-4 border border-gray-100">
+                    <img src="${project.image}" alt="${project.title}" class="w-full h-48 object-cover">
+                </div>
+                <div class="space-y-3">
+                    <div>
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase">Deskripsi Ringkas</h4>
+                        <p class="text-sm text-gray-700">${project.description}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase">Detail Proyek</h4>
+                        <p class="text-sm text-gray-600 leading-relaxed">${project.details}</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase">Teknologi Digunakan</h4>
+                        <p class="text-xs font-medium text-gray-800 bg-gray-100 inline-block px-2.5 py-1 rounded-md mt-1">${project.tech}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById("detailModal").classList.remove("hidden");
+        }
+
+        function closeModal() {
+            document.getElementById("detailModal").classList.add("hidden");
+        }
+
+        function openAddProjectModal() {
+            alert("Fitur penambahan proyek baru aktif!");
+        }
+    </script>
+</body>
+</html>
